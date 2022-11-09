@@ -1,0 +1,13 @@
+.simple-wysiwyg-buttons {
+  font-size: var(--font-size-xxs, 0.702rem);
+  position: absolute;
+  margin-top: calc(-0.702rem * 2);
+  background-color: var(--color-gray-050, #f3f4f9);
+  padding: calc(0.25rem - 1px) calc(0.5rem - 1px);
+}
+
+.simple-wysiwyg-buttons a {
+  padding: calc(0.25rem - 1px) calc(0.5rem - 1px);
+  color: inherit;
+  text-decoration: none;
+}

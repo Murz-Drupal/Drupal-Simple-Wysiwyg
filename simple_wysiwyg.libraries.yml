@@ -1,0 +1,10 @@
+simple_wysiwyg:
+  js:
+    js/simple-wysiwyg.js: {}
+  css:
+    component:
+      css/simple-wysiwyg.css: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - core/drupalSettings

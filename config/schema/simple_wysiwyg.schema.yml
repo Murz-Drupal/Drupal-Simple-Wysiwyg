@@ -1,0 +1,7 @@
+field.widget.settings.simple_wysiwyg:
+  type: mapping
+  label: Simple WYSIWYG widget settings
+  mapping:
+    foo:
+      type: string
+      label: Foo
