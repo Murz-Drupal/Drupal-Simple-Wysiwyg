@@ -38,6 +38,7 @@ class SimpleWysiwygWidget extends WidgetBase {
     return [
       'buttons_visible' => [self::BUTTONS_ALL_ID],
       'allowed_tags' => '<b><i><u><strong><em><a>',
+      'max_length' => '',
       'multiline' => FALSE,
     ] + parent::defaultSettings();
   }
@@ -74,6 +75,12 @@ class SimpleWysiwygWidget extends WidgetBase {
       '#description' => 'Allows using Enter to make multiline input.',
       '#default_value' => $this->getSetting('multiline'),
     ];
+    $element['max_length'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Maximum length'),
+      '#description' => 'Maximum length of the content. Leave empty to unlimited.',
+      '#default_value' => $this->getSetting('max_length'),
+    ];
 
     return $element;
   }
@@ -83,6 +90,7 @@ class SimpleWysiwygWidget extends WidgetBase {
    */
   public function settingsSummary() {
     $summary = [];
+    $summary[] = $this->getSetting('multiline') ? $this->t('Multiline') : $this->t('Single-line');
     $buttonsVisible = $this->getSetting('buttons_visible');
     if (!in_array(self::BUTTONS_ALL_ID, $buttonsVisible)) {
       foreach ($buttonsVisible as $id => $value) {
@@ -92,6 +100,12 @@ class SimpleWysiwygWidget extends WidgetBase {
         $buttons[] = $this->t(self::BUTTONS[$id]['title']);
       }
       $summary[] = $this->t('Visible buttons: @buttons', ['@buttons' => implode(', ', $buttons)]);
+    }
+    if ($maxLength = $this->getSetting('max_length')) {
+      $summary[] = $this->t('Maximum length: @length', ['@length' => $maxLength]);
+    }
+    if ($allowedTags = $this->getSetting('allowed_tags')) {
+      $summary[] = $this->t('Allowed tags: @allowedTags', ['@allowedTags' => $allowedTags]);
     }
     return $summary;
   }
@@ -118,35 +132,19 @@ class SimpleWysiwygWidget extends WidgetBase {
       $buttonsHtml[] = "<a href=\"#\" class=\"{$button['command']}\" data-command=\"{$button['command']}\" title=\"{$button['title']}\">{$this->t($button['button'])}</a>";
     }
 
-    $defaultValue = $items[$delta]->value ?? NULL;
-
-    $element['editor_buttons'] = [
-      '#type' => 'html_tag',
-      '#tag' => 'div',
-      '#value' => implode('', $buttonsHtml),
-      '#attributes' => [
-        'class' => ['simple-wysiwyg-buttons'],
-      ],
-      "#delta" => $delta,
+    $element['value'] = $elementOrig + [
+      '#type' => 'textfield',
+      '#default_value' => $items[$delta]->value ?? NULL,
+      '#maxlength' => $this->getSetting('max_length'),
     ];
-
-    $element['editor'] = $elementOrig + [
-      '#type' => 'html_tag',
-      '#tag' => 'div',
-      '#attributes' => [
-        'contenteditable' => "true",
-        'class' => ['simple-wysiwyg-editor', 'form-element'],
-        'data-simple-wysiwyg-settings' => json_encode($this->getSettings()),
-      ],
-      '#value' => $defaultValue,
-      "#delta" => $delta,
+    $jsSettings = [
+      'multiline' => $this->getSetting('multiline'),
+      'allowedTags' => $this->getSetting('allowed_tags'),
+      'buttons' => $buttons,
+      'maxLength' => $this->getSetting('max_length'),
     ];
-
-    $element['value'] = [
-      '#type' => 'hidden',
-      '#default_value' => $defaultValue,
-    ];
-
+    $element['value']['#attributes']['class'][] = 'simple-wysiwyg';
+    $element['value']['#attributes']['data-simple-wysiwyg-settings'] = json_encode($jsSettings);
     $element['#attached']['library'][] = 'simple_wysiwyg/simple_wysiwyg';
     return $element;
   }
