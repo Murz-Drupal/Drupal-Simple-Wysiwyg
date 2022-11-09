@@ -13,7 +13,19 @@
       const elements = once('simpleWysiwyg', '.simple-wysiwyg', context);
       elements.forEach((inputElement) => {
         const settings = JSON.parse(inputElement.getAttribute('data-simple-wysiwyg-settings'));
-        console.log(settings);
+
+        // Workaround for issue https://bugzilla.mozilla.org/show_bug.cgi?id=1615852.
+        const isFirefox = navigator.userAgent.includes("Firefox");
+
+        if (settings.allowedTags) {
+          if (settings.multiline) {
+            settings.allowedTags += '<p>';
+          }
+          if (isFirefox) {
+            settings.allowedTags += '<br>';
+          }
+        }
+
         let editorElement = document.createElement("div");
         editorElement.setAttribute('contenteditable', true);
         editorElement.setAttribute('class', 'form-element');
@@ -29,21 +41,26 @@
             filtered = stripTags(input, settings['allowedTags']);
           }
           if (settings.maxLength) {
-            console.log('trim');
-            console.log(settings.maxLength);
             filtered = filtered.substring(0, settings.maxLength);
           }
-          inputElement.value = filtered;
+          if (isFirefox) {
+            // Workaround for issue https://bugzilla.mozilla.org/show_bug.cgi?id=1615852.
+            inputElement.value = filtered.replace(/<br\/?>/, '');
+          }
+          else {
+            inputElement.value = filtered;
+          }
           // The update of html will lose cursor position, so
           // updating only in case when the filter changes something.
           if(input !== filtered) {
+            // @todo Try to keep cursor position.
             editorElement.innerHTML = filtered;
           }
         });
 
         editorElement.addEventListener('keypress', (event) => {
           if (event.key == 'Enter') {
-            if (settings?.multiline == true) {
+            if (settings.multiline) {
               document.execCommand('formatBlock', false, 'p');
             }
             else {
