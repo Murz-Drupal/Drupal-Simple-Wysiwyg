@@ -1,4 +1,4 @@
-(function (Drupal, drupalSettings, once) {
+(function (Drupal, once) {
   Drupal.behaviors.myfeature = {
     attach(context) {
       function stripTags(str, allow) {
@@ -41,8 +41,6 @@
           if (event.which === 13) {
             if (settings?.multiline == true) {
               document.execCommand('formatBlock', false, 'p');
-              // document.execCommand('insertParagraph');
-              // event.preventDefault();
             }
             else {
               event.preventDefault();
@@ -59,7 +57,7 @@
         });
 
         const buttons = buttonsBlock.getElementsByTagName('a');
-        const buttonsList = Array.prototype.slice.call(buttons); // copies elements, creates array
+        const buttonsList = Array.prototype.slice.call(buttons);
 
         buttonsList.forEach((buttonElement) => {
           buttonElement.addEventListener('click', function (e) {
@@ -79,4 +77,4 @@
       });
     }
   };
-}(Drupal, drupalSettings, once));
+}(Drupal, once));

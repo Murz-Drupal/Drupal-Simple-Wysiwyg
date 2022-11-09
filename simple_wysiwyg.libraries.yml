@@ -7,4 +7,3 @@ simple_wysiwyg:
   dependencies:
     - core/drupal
     - core/once
-    - core/drupalSettings
