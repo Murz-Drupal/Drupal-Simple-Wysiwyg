@@ -1,5 +1,5 @@
 (function (Drupal, once) {
-  Drupal.behaviors.myfeature = {
+  Drupal.behaviors.simpleWysiwyg = {
     attach(context) {
       function stripTags(str, allow) {
         allow = (((allow || "") + "").toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('');

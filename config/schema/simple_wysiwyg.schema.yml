@@ -2,6 +2,18 @@ field.widget.settings.simple_wysiwyg:
   type: mapping
   label: Simple WYSIWYG widget settings
   mapping:
-    foo:
+    buttons_visible:
+      type: sequence
+      label: Visible buttons
+      sequence:
+        type: string
+        label: Button ID
+    allowed_tags:
       type: string
-      label: Foo
+      label: Allowed tags
+    max_length:
+      type: string
+      label: Maximum length
+    multiline:
+      type: boolean
+      label: Multiline
