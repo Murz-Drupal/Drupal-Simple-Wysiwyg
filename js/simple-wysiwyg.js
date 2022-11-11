@@ -27,14 +27,31 @@
         }
 
         let editorElement = document.createElement("div");
-        editorElement.setAttribute('contenteditable', true);
         editorElement.setAttribute('class', 'form-element');
         editorElement.innerHTML = inputElement.value;
         inputElement.after(editorElement);
         inputElement.hidden = true;
 
-        // Adding a sync of content with input field.
-        editorElement.addEventListener("input", () => {
+        if (inputElement.getAttribute('disabled')) {
+          editorElement.setAttribute('disabled', 'true');
+          return;
+        }
+
+        // Workaround for pages with attached CKEditor, because the
+        // `disableAutoInline` config options doesn't work.
+        //
+        // @see https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR.html#cfg-disableAutoInline
+        // @see https://stackoverflow.com/questions/60955366/can-i-disable-ckeditor-initializing-on-elements-with-contenteditable-true
+        if (typeof(CKEDITOR) !== 'undefined') {
+          CKEDITOR.on('instanceReady', function(){
+            editorElement.setAttribute('contenteditable', 'true');
+          });
+        }
+        else {
+          editorElement.setAttribute('contenteditable', 'true');
+        }
+
+        editorElement.addEventListener("input", (event) => {
           const input = editorElement.innerHTML;
           let filtered = input;
           if (settings['allowedTags']) {
