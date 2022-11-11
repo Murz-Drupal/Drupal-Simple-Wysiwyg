@@ -76,6 +76,10 @@
         });
 
         editorElement.addEventListener('keypress', (event) => {
+          if (settings.maxLength && editorElement.innerHTML.length >= settings.maxLength) {
+            event.preventDefault();
+          }
+
           if (event.key == 'Enter') {
             if (settings.multiline) {
               document.execCommand('formatBlock', false, 'p');
