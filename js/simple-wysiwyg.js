@@ -9,6 +9,25 @@
           return allow.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
         });
       }
+      function removeRequiredAttribute(inputElement) {
+        // A workaround for the issue with hidden required fields
+        // see https://stackoverflow.com/a/23215333/1395757
+        if(inputElement.hasAttribute('required')) {
+          inputElement.removeAttribute('required');
+        }
+      }
+      function syncDisabledAttribute(source, target) {
+        if(source.hasAttribute('disabled')) {
+          target.setAttribute('disabled', source.getAttribute('disabled'));
+        }
+        else {
+          target.removeAttribute('disabled');
+        }
+
+        if (target.hasAttribute('contenteditable')) {
+          target.setAttribute('contenteditable', !target.hasAttribute('disabled'));
+        }
+      }
 
       const elements = once('simpleWysiwyg', '.simple-wysiwyg', context);
       elements.forEach((inputElement) => {
@@ -29,27 +48,49 @@
         let editorElement = document.createElement("div");
         editorElement.setAttribute('class', 'form-element');
         editorElement.innerHTML = inputElement.value;
-        inputElement.after(editorElement);
-        inputElement.hidden = true;
-
-        if (inputElement.getAttribute('disabled')) {
-          editorElement.setAttribute('disabled', 'true');
-          return;
+        if (inputElement.classList.contains('error')) {
+          editorElement.classList.add('error');
         }
+        inputElement.after(editorElement);
+        if(inputElement.type == 'input') {
+          inputElement.hidden = true;
+        }
+        else {
+          inputElement.style.display = 'none';
+        }
+
+        removeRequiredAttribute(inputElement);
+        syncDisabledAttribute(inputElement, editorElement);
+
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type === "attributes") {
+              removeRequiredAttribute(mutation.target);
+              syncDisabledAttribute(mutation.target, editorElement);
+            }
+          });
+        });
+        observer.observe(inputElement, {attributes: true, attributeFilter: ['disabled', 'required']});
 
         // Workaround for pages with attached CKEditor, because the
         // `disableAutoInline` config options doesn't work.
         //
         // @see https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR.html#cfg-disableAutoInline
         // @see https://stackoverflow.com/questions/60955366/can-i-disable-ckeditor-initializing-on-elements-with-contenteditable-true
-        if (typeof(CKEDITOR) !== 'undefined') {
-          CKEDITOR.on('instanceReady', function(){
-            editorElement.setAttribute('contenteditable', 'true');
+        const contenteditable = !editorElement.hasAttribute('disabled');
+        if (typeof(CKEDITOR) !== 'undefined' && !window.ckeditorInstanceReady) {
+          CKEDITOR.on('instanceReady', function() {
+            editorElement.setAttribute('contenteditable', contenteditable);
+            window.ckeditorInstanceReady = true;
           });
         }
         else {
-          editorElement.setAttribute('contenteditable', 'true');
+          editorElement.setAttribute('contenteditable', contenteditable);
         }
+
+        inputElement.addEventListener("change", () => {
+          editorElement.innerHTML = inputElement.value;
+        });
 
         editorElement.addEventListener("input", (event) => {
           const input = editorElement.innerHTML;
@@ -91,7 +132,7 @@
         });
 
         if(settings.buttons) {
-          let editorButtons = document.createElement("div");
+          let editorButtons = document.createElement('div');
           editorButtons.setAttribute('class', 'simple-wysiwyg-buttons');
           editorButtons.hidden = true;
           editorElement.before(editorButtons);

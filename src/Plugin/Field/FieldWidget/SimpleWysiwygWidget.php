@@ -132,17 +132,32 @@ class SimpleWysiwygWidget extends WidgetBase {
       $buttonsHtml[] = "<a href=\"#\" class=\"{$button['command']}\" data-command=\"{$button['command']}\" title=\"{$button['title']}\">{$this->t($button['button'])}</a>";
     }
 
+    switch ($items->getFieldDefinition()->getType()) {
+      case 'string':
+      case 'text':
+      default:
+        $baseElementType = 'textfield';
+        break;
+
+      case 'string_long':
+      case 'text_long':
+        $baseElementType = 'textarea';
+        break;
+    }
+
     $element['value'] = $elementOrig + [
-      '#type' => 'textfield',
+      '#type' => $baseElementType,
       '#default_value' => $items[$delta]->value ?? NULL,
-      '#maxlength' => $this->getSetting('max_length'),
     ];
     $jsSettings = [
       'multiline' => $this->getSetting('multiline'),
       'allowedTags' => $this->getSetting('allowed_tags'),
       'buttons' => $buttons,
-      'maxLength' => $this->getSetting('max_length'),
     ];
+    if($this->getSetting('max_length')) {
+      $jsSettings['maxLength'] = $this->getSetting('max_length');
+      $element['value']['#maxlength'] = $this->getSetting('max_length');
+    }
     $element['value']['#attributes']['class'][] = 'simple-wysiwyg';
     $element['value']['#attributes']['data-simple-wysiwyg-settings'] = json_encode($jsSettings);
     $element['#attached']['library'][] = 'simple_wysiwyg/simple_wysiwyg';
