@@ -38,9 +38,9 @@
 
         if (settings.allowedTags) {
           if (settings.multiline) {
-            settings.allowedTags += '<p>';
+            settings.allowedTags += '<br>';
           }
-          if (isFirefox) {
+          if (isFirefox && !settings.allowedTags.includes('<br>')) {
             settings.allowedTags += '<br>';
           }
         }
@@ -108,6 +108,12 @@
           else {
             inputElement.value = filtered;
           }
+          if (settings.multiline) {
+            if (stripTags(filtered) == '') {
+              filtered = '';
+              inputElement.value = filtered;
+            }
+          }
           // The update of html will lose cursor position, so
           // updating only in case when the filter changes something.
           if(input !== filtered) {
@@ -122,11 +128,9 @@
           }
 
           if (event.key == 'Enter') {
+            event.preventDefault();
             if (settings.multiline) {
-              document.execCommand('formatBlock', false, 'p');
-            }
-            else {
-              event.preventDefault();
+              document.execCommand('insertLineBreak');
             }
           }
         });
