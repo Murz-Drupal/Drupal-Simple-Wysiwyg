@@ -2,8 +2,8 @@
 
 namespace Drupal\simple_wysiwyg\Plugin\Field\FieldFormatter;
 
-use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Field\FormatterBase;
 
 /**
  * Defines the 'simple_wysiwyg' field formatter.

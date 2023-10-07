@@ -23,10 +23,26 @@ use Drupal\Core\Form\FormStateInterface;
 class SimpleWysiwygWidget extends WidgetBase {
 
   const BUTTONS = [
-    'bold' => ['button' => '<strong>B</strong>', 'command' => 'bold', 'title' => 'Bold'],
-    'italic' => ['button' => '<em>I</em>', 'command' => 'italic', 'title' => 'Italic'],
-    'underline' => ['button' => '<u>U</u>', 'command' => 'underline', 'title' => 'Underline'],
-    'source' => ['button' => 'Source', 'command' => 'showSource', 'title' => 'Show source code'],
+    'bold' => [
+      'button' => '<strong>B</strong>',
+      'command' => 'bold',
+      'title' => 'Bold',
+    ],
+    'italic' => [
+      'button' => '<em>I</em>',
+      'command' => 'italic',
+      'title' => 'Italic',
+    ],
+    'underline' => [
+      'button' => '<u>U</u>',
+      'command' => 'underline',
+      'title' => 'Underline',
+    ],
+    'source' => [
+      'button' => 'Source',
+      'command' => 'showSource',
+      'title' => 'Show source code',
+    ],
   ];
 
   const BUTTONS_ALL_ID = '_all';
@@ -51,34 +67,37 @@ class SimpleWysiwygWidget extends WidgetBase {
     $buttonsOptions[self::BUTTONS_ALL_ID] = $this->t('All buttons');
 
     foreach (self::BUTTONS as $id => $settings) {
+      // @see https://www.drupal.org/project/coder/issues/3326197
+      // @codingStandardsIgnoreStart
       $buttonsOptions[$id] = $this->t($settings['title']);
+      // @codingStandardsIgnoreEnd
     }
 
     $element['buttons_visible'] = [
       '#type' => 'checkboxes',
       '#options' => $buttonsOptions,
       '#title' => $this->t('Visible buttons'),
-      '#description' => 'Choose buttons to enable. Leave empty to show all buttons.',
+      '#description' => $this->t('Choose buttons to enable. Leave empty to show all buttons.'),
       '#default_value' => $this->getSetting('buttons_visible'),
     ];
 
     $element['allowed_tags'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Allowed tags'),
-      '#description' => 'List of allowed tags in format: <code>&lt;b&gt;&lt;i&gt;&lt;a&gt;</code>.',
+      '#description' => $this->t('List of allowed tags in format: <code>&lt;b&gt;&lt;i&gt;&lt;a&gt;</code>.'),
       '#default_value' => $this->getSetting('allowed_tags'),
     ];
 
     $element['multiline'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Allow multiple lines'),
-      '#description' => 'Allows using Enter to make multiline input.',
+      '#description' => $this->t('Allows using Enter to make multiline input.'),
       '#default_value' => $this->getSetting('multiline'),
     ];
     $element['max_length'] = [
       '#type' => 'number',
       '#title' => $this->t('Maximum length'),
-      '#description' => 'Maximum length of the content. Leave empty to unlimited.',
+      '#description' => $this->t('Maximum length of the content. Leave empty to unlimited.'),
       '#default_value' => $this->getSetting('max_length'),
     ];
 
@@ -97,7 +116,10 @@ class SimpleWysiwygWidget extends WidgetBase {
         if (!$value) {
           continue;
         }
+        // @see https://www.drupal.org/project/coder/issues/3326197
+        // @codingStandardsIgnoreStart
         $buttons[] = $this->t(self::BUTTONS[$id]['title']);
+        // @codingStandardsIgnoreEnd
       }
       $summary[] = $this->t('Visible buttons: @buttons', ['@buttons' => implode(', ', $buttons)]);
     }
@@ -154,7 +176,7 @@ class SimpleWysiwygWidget extends WidgetBase {
       'allowedTags' => $this->getSetting('allowed_tags'),
       'buttons' => $buttons,
     ];
-    if($this->getSetting('max_length')) {
+    if ($this->getSetting('max_length')) {
       $jsSettings['maxLength'] = $this->getSetting('max_length');
       $element['value']['#maxlength'] = $this->getSetting('max_length');
     }

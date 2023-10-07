@@ -12,12 +12,12 @@
       function removeRequiredAttribute(inputElement) {
         // A workaround for the issue with hidden required fields
         // see https://stackoverflow.com/a/23215333/1395757
-        if(inputElement.hasAttribute('required')) {
+        if (inputElement.hasAttribute('required')) {
           inputElement.removeAttribute('required');
         }
       }
       function syncDisabledAttribute(source, target) {
-        if(source.hasAttribute('disabled')) {
+        if (source.hasAttribute('disabled')) {
           target.setAttribute('disabled', source.getAttribute('disabled'));
         }
         else {
@@ -52,7 +52,7 @@
           editorElement.classList.add('error');
         }
         inputElement.after(editorElement);
-        if(inputElement.type == 'input') {
+        if (inputElement.type == 'input') {
           inputElement.hidden = true;
         }
         else {
@@ -62,15 +62,15 @@
         removeRequiredAttribute(inputElement);
         syncDisabledAttribute(inputElement, editorElement);
 
-        const observer = new MutationObserver(function(mutations) {
-          mutations.forEach(function(mutation) {
+        const observer = new MutationObserver(function (mutations) {
+          mutations.forEach(function (mutation) {
             if (mutation.type === "attributes") {
               removeRequiredAttribute(mutation.target);
               syncDisabledAttribute(mutation.target, editorElement);
             }
           });
         });
-        observer.observe(inputElement, {attributes: true, attributeFilter: ['disabled', 'required']});
+        observer.observe(inputElement, { attributes: true, attributeFilter: ['disabled', 'required'] });
 
         // Workaround for pages with attached CKEditor, because the
         // `disableAutoInline` config options doesn't work.
@@ -78,8 +78,8 @@
         // @see https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR.html#cfg-disableAutoInline
         // @see https://stackoverflow.com/questions/60955366/can-i-disable-ckeditor-initializing-on-elements-with-contenteditable-true
         const contenteditable = !editorElement.hasAttribute('disabled');
-        if (typeof(CKEDITOR) !== 'undefined' && !window.ckeditorInstanceReady) {
-          CKEDITOR.on('instanceReady', function() {
+        if (typeof (CKEDITOR) !== 'undefined' && !window.ckeditorInstanceReady) {
+          CKEDITOR.on('instanceReady', function () {
             editorElement.setAttribute('contenteditable', contenteditable);
             window.ckeditorInstanceReady = true;
           });
@@ -116,7 +116,7 @@
           }
           // The update of html will lose cursor position, so
           // updating only in case when the filter changes something.
-          if(input !== filtered) {
+          if (input !== filtered) {
             // @todo Try to keep cursor position.
             editorElement.innerHTML = filtered;
           }
@@ -135,7 +135,7 @@
           }
         });
 
-        if(settings.buttons) {
+        if (settings.buttons) {
           let editorButtons = document.createElement('div');
           editorButtons.setAttribute('class', 'simple-wysiwyg-buttons');
           editorButtons.hidden = true;
@@ -144,7 +144,7 @@
           Object.keys(settings.buttons).forEach((buttonId) => {
             let buttonElement = document.createElement("a");
             buttonElement.innerHTML = settings.buttons[buttonId].button,
-            buttonElement.setAttribute('data-command', settings.buttons[buttonId].command);
+              buttonElement.setAttribute('data-command', settings.buttons[buttonId].command);
             buttonElement.setAttribute('title', settings.buttons[buttonId].title);
             buttonElement.setAttribute('href', '#');
 
@@ -171,7 +171,7 @@
             editorButtons.hidden = false;
           });
           editorElement.addEventListener('blur', () => {
-            buttonsTimeout = setTimeout(() => {editorButtons.hidden = true}, 200);
+            buttonsTimeout = setTimeout(() => { editorButtons.hidden = true }, 200);
           });
         }
       });
